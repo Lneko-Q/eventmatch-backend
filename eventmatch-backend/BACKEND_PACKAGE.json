@@ -1,0 +1,30 @@
+{
+  "name": "eventmatch-api",
+  "version": "1.0.0",
+  "description": "EventMatch API Server for cloud authentication sync",
+  "main": "BACKEND_EXAMPLE.js",
+  "scripts": {
+    "start": "node BACKEND_EXAMPLE.js",
+    "dev": "nodemon BACKEND_EXAMPLE.js"
+  },
+  "keywords": [
+    "eventmatch",
+    "api",
+    "authentication"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "bcryptjs": "^2.4.3",
+    "sqlite3": "^5.1.6",
+    "dotenv": "^16.0.3"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.20"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}
