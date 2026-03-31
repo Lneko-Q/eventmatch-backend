@@ -302,6 +302,43 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', message: 'Server is running' });
 });
 
+/**
+ * POST /api/admin/delete-all
+ * Destructive admin endpoint to wipe all users, groups, members and messages.
+ * Requires header 'x-admin-token' matching the server's ADMIN_TOKEN environment variable.
+ */
+app.post('/api/admin/delete-all', (req, res) => {
+    try {
+        const provided = req.headers['x-admin-token'];
+        const adminToken = process.env.ADMIN_TOKEN;
+
+        if (!adminToken) {
+            console.error('Admin delete attempted but ADMIN_TOKEN is not set on server');
+            return res.status(500).json({ error: 'Admin token not configured on server' });
+        }
+
+        if (!provided || provided !== adminToken) {
+            return res.status(403).json({ error: 'Forbidden' });
+        }
+
+        db.serialize(() => {
+            db.run('DELETE FROM groupMessages', (err) => { if (err) console.error('delete groupMessages', err); });
+            db.run('DELETE FROM groupMembers', (err) => { if (err) console.error('delete groupMembers', err); });
+            db.run('DELETE FROM groups', (err) => { if (err) console.error('delete groups', err); });
+            db.run('DELETE FROM users', (err) => {
+                if (err) {
+                    console.error('delete users', err);
+                    return res.status(500).json({ error: 'Failed to delete data' });
+                }
+                db.run('VACUUM', (vErr) => { if (vErr) console.error('vacuum', vErr); });
+                res.json({ message: 'All data deleted' });
+            });
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
 app.listen(PORT, () => {
   console.log(`EventMatch backend listening on port ${PORT}`);
 });
